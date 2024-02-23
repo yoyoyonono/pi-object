@@ -136,7 +136,7 @@ def move_robot():
 # which decides how long the motion command is to be given to the motors.
 def get_delay(deviation, direction):
     deviation = abs(deviation)
-    return deviation * 255
+    return int(deviation * 255)
 
 
 def main():
