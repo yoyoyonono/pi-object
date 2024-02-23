@@ -59,6 +59,8 @@ def track_object(objs, labels):
     if (len(objs) == 0):
         print("no objects to track")
         tracking_data = [0, 0, 0, 0, 0, 0]
+        x_deviation = 0
+        y_deviation = 0
         return
 
     for obj in objs:

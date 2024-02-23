@@ -50,6 +50,8 @@ def forward():
 def stop():
     roboclaw.ForwardM1(address,0)
     roboclaw.ForwardM2(address,0)
+    roboclaw.BackwardM1(address,0)
+    roboclaw.BackwardM2(address,0)
     print("stop")
 
 def speak_tts(text,gender):
