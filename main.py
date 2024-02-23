@@ -101,6 +101,7 @@ def move_robot():
     if (abs(x_deviation) < tolerance and abs(y_deviation) < tolerance):
         cmd = "Stop"
         delay1 = 0
+        ut.stop()
 
     else:
         if (abs(x_deviation) > abs(y_deviation)):
