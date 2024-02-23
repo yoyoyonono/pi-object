@@ -7,6 +7,7 @@ website: https://helloworld.co.in
 '''
 
 import os, time
+from roboclaw import Roboclaw
 
 edgetpu=0 # If Coral USB Accelerator connected, then make it '1' otherwise '0'
 
@@ -18,44 +19,57 @@ cam_light = 17
 headlight_right = 18
 headlight_left = 27 
 sp_light=9 
+address = 0x80
+roboclaw = Roboclaw("COM15", 38400)
 
 
 def init_gpio():
-	pass
+    while not roboclaw.Open():
+        pass
 
 def back():
+    roboclaw.BackwardM1(address,64)
+    roboclaw.BackwardM2(address,64)	
     print("moving back!!!!!!")
     
 def right():
-	print("right")
+    roboclaw.BackwardM1(address,64)
+    roboclaw.ForwardM2(address,64)
+    print("right")
 
 def left():
-	print("left")
-	
+    roboclaw.ForwardM1(address,64)
+    roboclaw.BackwardM2(address,64)
+    print("left")
+    
 def forward():
-	print("forward")
-	
+    roboclaw.ForwardM1(address,64)
+    roboclaw.ForwardM2(address,64)
+    print("forward")
+    
 def stop():
-	print("stop")
+    roboclaw.ForwardM1(address,0)
+    roboclaw.ForwardM2(address,0)
+    print("stop")
 
 def speak_tts(text,gender):
-	pass
-	
+    pass
+    
 def camera_light(state):
-	if(state=="ON"):
-		print("light on")
-	else:
-		print("light off")
-		
+    if(state=="ON"):
+        print("light on")
+    else:
+        print("light off")
+        
 def head_lights(state):
-	if(state=="ON"):
-		print("light on")
-	else:
-		print("light off")
-		
+    if(state=="ON"):
+        print("light on")
+    else:
+        print("light off")
+        
 def red_light(state):
-	if(state=="ON"):
-		print("light on")
-	else:
-		print("light off")
-	
+    if(state=="ON"):
+        print("light on")
+    else:
+        print("light off")
+    

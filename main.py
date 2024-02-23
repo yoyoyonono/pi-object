@@ -25,25 +25,22 @@ import numpy as np
 from PIL import Image
 import time
 from threading import Thread
+import all_color
+import util as ut
 
 import sys
 sys.path.insert(0, '/var/www/html/earthrover')
+
+labels = {1: "red", 2: "blue", 3:"green", 4:"yellow"}
 
 cap = cv2.VideoCapture(1)
 threshold = 0.2
 top_k = 5  # number of objects to be shown as detected
 
-model_dir = 'all_models/'
-model = 'mobilenet_ssd_v2_coco_quant_postprocess.tflite'
-model_edgetpu = 'mobilenet_ssd_v2_coco_quant_postprocess_edgetpu.tflite'
-labels_path = 'coco_labels.txt'
-
 tolerance = 0.1
 x_deviation = 0
 y_deviation = 0
 tracking_data = [0, 0, 0, 0, 0, 0]
-
-valid_objects = ['laptop']
 
 # -----initialise motor speed-----------------------------------
 
@@ -64,20 +61,9 @@ def track_object(objs, labels):
         tracking_data = [0, 0, 0, 0, 0, 0]
         return
 
-    k = 0
-    flag = 0
     for obj in objs:
-        lbl = labels.get(obj.id, obj.id)
-        k = valid_objects.count(lbl)
-        if (k > 0):
-            x_min, y_min, x_max, y_max = list(obj.bbox)
-            flag = 1
-            break
-
-#    print(x_min, y_min, x_max, y_max)
-    if (flag == 0):
-        print("selected object no present")
-        return
+        x_min, y_min, x_max, y_max = list(obj.bbox)
+        break
 
     x_diff = x_max-x_min
     y_diff = y_max-y_min
@@ -120,26 +106,34 @@ def move_robot():
                 cmd = "Move Left"
                 delay1 = get_delay(x_deviation, 'l')
 
+                ut.left()
                 time.sleep(delay1)
+                ut.stop()
 
             if (x_deviation <= -1*tolerance):
                 cmd = "Move Right"
                 delay1 = get_delay(x_deviation, 'r')
 
+                ut.right()
                 time.sleep(delay1)
+                ut.stop()
         else:
 
             if (y_deviation >= tolerance):
                 cmd = "Move Forward"
                 delay1 = get_delay(y_deviation, 'f')
 
+                ut.forward()
                 time.sleep(delay1)
+                ut.stop()
 
             if (y_deviation <= -1*tolerance):
                 cmd = "Move Backward"
                 delay1 = get_delay(y_deviation, 'b')
 
+                ut.back()
                 time.sleep(delay1)
+                ut.stop()
 
     tracking_data[4] = cmd
     tracking_data[5] = delay1
@@ -179,12 +173,7 @@ def main():
     print('asdlfkjsdklfj')
     from util import edgetpu
 
-    if (edgetpu == 1):
-        mdl = model_edgetpu
-    else:
-        mdl = model
-
-    interpreter, labels = cm.load_model(model_dir, mdl, labels_path, edgetpu)
+    ut.init_gpio()
 
     fps = 1
     arr_dur = [0, 0, 0]
@@ -209,10 +198,7 @@ def main():
 
         # -------------------Inference---------------------------------
         start_t1 = time.time()
-        cm.set_input(interpreter, pil_im)
-        interpreter.invoke()
-        objs = cm.get_output(
-            interpreter, score_threshold=threshold, top_k=top_k)
+        objs = all_color.find_objects(frame)
 
         for x in objs:
             print(labels[x.id], end='\t')
@@ -239,6 +225,8 @@ def main():
         arr_dur[2] = time.time() - start_t2
         # cm.time_elapsed(start_t2,"other")
         # cm.time_elapsed(start_time,"overall")
+
+        move_robot()
 
         print("arr_dur:", arr_dur)
         fps = round(1.0 / (time.time() - start_time), 1)
@@ -310,12 +298,11 @@ def draw_overlays(cv2_im, objs, labels, arr_dur, arr_track_data):
     cv2_im = cv2.putText(cv2_im, str_sp, (int(width/2) +
                          185, height-8), font, 0.55, (150, 150, 255), 2)
 
-    if (cmd == 0):
-        str1 = "No object"
-    elif (cmd == 'Stop'):
-        str1 = 'Acquired'
+    if len(objs) > 0:
+        str1 = f'{labels[objs[0].id]}'
     else:
-        str1 = 'Tracking'
+        str1 = 'No object'
+
     cv2_im = cv2.putText(cv2_im, str1, (width-140, 18),
                          font, 0.7, (0, 255, 255), 2)
 
@@ -336,16 +323,14 @@ def draw_overlays(cv2_im, objs, labels, arr_dur, arr_track_data):
     # draw bounding boxes
     for obj in objs:
         x0, y0, x1, y1 = list(obj.bbox)
-        x0, y0, x1, y1 = int(
-            x0*width), int(y0*height), int(x1*width), int(y1*height)
+        x0, y0, x1, y1 = int(x0*width), int(y0*height), int(x1*width), int(y1*height)
         percent = int(100 * obj.score)
 
         box_color, text_color, thickness = (0, 150, 255), (0, 255, 0), 2
-        cv2_im = cv2.rectangle(
-            cv2_im, (x0, y0), (x1, y1), box_color, thickness)
+        cv2_im = cv2.rectangle(cv2_im, (x0, y0), (x1, y1), box_color, thickness)
 
-        # text3 = '{}% {}'.format(percent, labels.get(obj.id, obj.id))
-        # cv2_im = cv2.putText(cv2_im, text3, (x0, y1-5),font, 0.5, text_color, thickness)
+        text3 = '{}% {}'.format(percent, labels.get(obj.id, obj.id))
+        cv2_im = cv2.putText(cv2_im, text3, (x0, y1-5),font, 0.5, text_color, thickness)
 
     return cv2_im
 
