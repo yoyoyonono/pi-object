@@ -7,7 +7,6 @@ https://github.com/google-coral/examples-camera/tree/master/opencv
 """
 import numpy as np
 from PIL import Image
-import tflite_runtime.interpreter as tflite
 import platform
 
 
@@ -16,19 +15,6 @@ EDGETPU_SHARED_LIB = {
   'Darwin': 'libedgetpu.1.dylib',
   'Windows': 'edgetpu.dll'
 }[platform.system()]
-
-def make_interpreter_0(model_file):
-    model_file, *device = model_file.split('@')
-    return tflite.Interpreter(model_path=model_file)
-
-def make_interpreter_1(model_file):
-    model_file, *device = model_file.split('@')
-    return tflite.Interpreter(
-      model_path=model_file,
-      experimental_delegates=[
-          tflite.load_delegate(EDGETPU_SHARED_LIB,
-                               {'device': device[0]} if device else {})
-      ])
 
 def set_input(interpreter, image, resample=Image.NEAREST):
     """Copies data to input tensor."""
