@@ -111,7 +111,7 @@ def find_objects(frame):
     for mask, color in [(mask_red, 1), (mask_blue, 2), (mask_green, 3), (mask_yellow, 4)]:
         mask_ = Image.fromarray(mask)
         bbox = mask_.getbbox()  # returns bounding box for the mask
-        if bbox is not None:
+        if bbox is not None and color == 3:
             bbox_real = (bbox[0] / frame.shape[1], bbox[1] / frame.shape[0], bbox[2] / frame.shape[1], bbox[3] / frame.shape[0])
             color_objects.append(ColorObject(id=color, bbox=bbox_real))
 
