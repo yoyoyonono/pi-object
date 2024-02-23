@@ -27,24 +27,24 @@ def init_gpio():
     while not roboclaw.Open():
         pass
 
-def back():
-    roboclaw.BackwardM1(address,64)
-    roboclaw.BackwardM2(address,64)	
+def back(value):
+    roboclaw.BackwardM1(address,value)
+    roboclaw.BackwardM2(address,value)	
     print("moving back!!!!!!")
     
-def right():
-    roboclaw.BackwardM1(address,64)
-    roboclaw.ForwardM2(address,64)
+def right(value):
+    roboclaw.BackwardM1(address,value)
+    roboclaw.ForwardM2(address,value)
     print("right")
 
-def left():
-    roboclaw.ForwardM1(address,64)
-    roboclaw.BackwardM2(address,64)
+def left(value):
+    roboclaw.ForwardM1(address,value)
+    roboclaw.BackwardM2(address,value)
     print("left")
     
-def forward():
-    roboclaw.ForwardM1(address,64)
-    roboclaw.ForwardM2(address,64)
+def forward(value):
+    roboclaw.ForwardM1(address,value)
+    roboclaw.ForwardM2(address,value)
     print("forward")
     
 def stop():

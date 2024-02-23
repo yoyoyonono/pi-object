@@ -108,34 +108,26 @@ def move_robot():
                 cmd = "Move Left"
                 delay1 = get_delay(x_deviation, 'l')
 
-                ut.left()
-                time.sleep(delay1)
-                ut.stop()
+                ut.left(delay1)
 
             if (x_deviation <= -1*tolerance):
                 cmd = "Move Right"
                 delay1 = get_delay(x_deviation, 'r')
 
-                ut.right()
-                time.sleep(delay1)
-                ut.stop()
+                ut.right(delay1)
         else:
 
             if (y_deviation >= tolerance):
                 cmd = "Move Forward"
                 delay1 = get_delay(y_deviation, 'f')
 
-                ut.forward()
-                time.sleep(delay1)
-                ut.stop()
+                ut.forward(delay1)
 
             if (y_deviation <= -1*tolerance):
                 cmd = "Move Backward"
                 delay1 = get_delay(y_deviation, 'b')
 
-                ut.back()
-                time.sleep(delay1)
-                ut.stop()
+                ut.back(delay1)
 
     tracking_data[4] = cmd
     tracking_data[5] = delay1
@@ -144,30 +136,7 @@ def move_robot():
 # which decides how long the motion command is to be given to the motors.
 def get_delay(deviation, direction):
     deviation = abs(deviation)
-    if (direction == 'f' or direction == 'b'):
-        if (deviation >= 0.3):
-            d = 0.1
-        elif (deviation >= 0.2 and deviation < 0.30):
-            d = 0.075
-        elif (deviation >= 0.15 and deviation < 0.2):
-            d = 0.045
-        else:
-            d = 0.035
-    else:
-        if (deviation >= 0.4):
-            d = 0.080
-        elif (deviation >= 0.35 and deviation < 0.40):
-            d = 0.070
-        elif (deviation >= 0.30 and deviation < 0.35):
-            d = 0.060
-        elif (deviation >= 0.25 and deviation < 0.30):
-            d = 0.050
-        elif (deviation >= 0.20 and deviation < 0.25):
-            d = 0.040
-        else:
-            d = 0.030
-
-    return d
+    return deviation * 255
 
 
 def main():
